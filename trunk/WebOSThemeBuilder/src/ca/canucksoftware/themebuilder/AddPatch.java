@@ -5,20 +5,20 @@ import javax.swing.JFileChooser;
 import java.io.File;
 import java.util.List;
 
-public class AddFile extends javax.swing.JDialog {
-    public FileEntry item;
+public class AddPatch extends javax.swing.JDialog {
+    public PatchEntry item;
     public String version;
     public File prevDir;
 
-    public AddFile(java.awt.Frame parent, FileEntry curr, String currVersion, List<String> versions, String currCategory) {
+    public AddPatch(java.awt.Frame parent, PatchEntry curr, String currVersion, List<String> versions, String currCategory) {
         super(parent);
         initComponents();
         if(curr!=null) {
             setTitle("Edit Entry");
             jButton2.setText("OK");
-            item = curr;
+            item = new PatchEntry();
+            item.file = curr.file;
             jTextField1.setText(item.file.getPath());
-            jTextField2.setText(item.dest);
             for(int i=0; i<jComboBox1.getItemCount(); i++) {
                 String cat = ((String) jComboBox1.getItemAt(i)).toLowerCase().replaceAll(" ", "_");
                 if(cat.equals(curr.category)) {
@@ -34,7 +34,7 @@ public class AddFile extends javax.swing.JDialog {
                     break;
                 }
             }
-            item = new FileEntry();
+            item = new PatchEntry();
         }
         version = currVersion;
         for(int i=0; i<versions.size(); i++) {
@@ -56,7 +56,8 @@ public class AddFile extends javax.swing.JDialog {
         JFileChooser fc = new JFileChooser(); //Create a file chooser
         if(prevDir!=null)
             fc.setCurrentDirectory(prevDir);
-        fc.setAcceptAllFileFilterUsed(true);
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.setFileFilter(new FileChooseFilter());
         fc.setMultiSelectionEnabled(false);
         fc.setDialogTitle("");
         if (fc.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION) {
@@ -83,17 +84,16 @@ public class AddFile extends javax.swing.JDialog {
         jLayeredPane2 = new javax.swing.JLayeredPane();
         jButton3 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
-        jComboBox1 = new javax.swing.JComboBox();
-        jComboBox2 = new javax.swing.JComboBox();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        jComboBox2 = new javax.swing.JComboBox();
+        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(ca.canucksoftware.themebuilder.WebOSThemeBuilderApp.class).getContext().getResourceMap(AddFile.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(ca.canucksoftware.themebuilder.WebOSThemeBuilderApp.class).getContext().getResourceMap(AddPatch.class);
         setTitle(resourceMap.getString("title")); // NOI18N
         setBackground(resourceMap.getColor("transfer.background")); // NOI18N
         setForeground(resourceMap.getColor("transfer.foreground")); // NOI18N
@@ -126,7 +126,7 @@ public class AddFile extends javax.swing.JDialog {
                 jButton3ActionPerformed(evt);
             }
         });
-        jButton3.setBounds(260, 140, 79, 25);
+        jButton3.setBounds(260, 110, 79, 25);
         jLayeredPane2.add(jButton3, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jTextField1.setText(resourceMap.getString("jTextField1.text")); // NOI18N
@@ -143,39 +143,40 @@ public class AddFile extends javax.swing.JDialog {
         jTextField1.setBounds(130, 10, 300, 22);
         jLayeredPane2.add(jTextField1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jComboBox1.setMaximumRowCount(13);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "App Icons", "App Launcher", "Applications", "Boot Logo", "Enyo Widgets", "Exhibition", "Just Type", "Keyboard", "Lock Screen", "Quick Launcher", "Status Bar", "System Menus", "Wallpapers" }));
-        jComboBox1.setSelectedIndex(2);
-        jComboBox1.setName("jComboBox1"); // NOI18N
-        jComboBox1.setBounds(130, 70, 180, 22);
-        jLayeredPane2.add(jComboBox1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jTextField2.setFocusable(false);
+        jTextField2.setName("jTextField2"); // NOI18N
+        jTextField2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTextField2MouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTextField2MousePressed(evt);
+            }
+        });
+        jTextField2.setBounds(130, 10, 300, 22);
+        jLayeredPane2.add(jTextField2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jComboBox2.setName("jComboBox2"); // NOI18N
-        jComboBox2.setBounds(130, 100, 180, 22);
+        jComboBox2.setBounds(130, 70, 180, 22);
         jLayeredPane2.add(jComboBox2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jLabel2.setFont(resourceMap.getFont("jLabel2.font")); // NOI18N
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
+        jLabel2.setBounds(20, 40, 110, 20);
+        jLayeredPane2.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jLabel3.setFont(resourceMap.getFont("jLabel3.font")); // NOI18N
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+        jLabel3.setBounds(20, 10, 50, 20);
+        jLayeredPane2.add(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jLabel4.setFont(resourceMap.getFont("jLabel4.font")); // NOI18N
         jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
         jLabel4.setName("jLabel4"); // NOI18N
         jLabel4.setBounds(20, 70, 110, 20);
         jLayeredPane2.add(jLabel4, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jLabel2.setFont(resourceMap.getFont("jLabel2.font")); // NOI18N
-        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
-        jLabel2.setName("jLabel2"); // NOI18N
-        jLabel2.setBounds(20, 10, 50, 20);
-        jLayeredPane2.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jTextField2.setText(resourceMap.getString("jTextField2.text")); // NOI18N
-        jTextField2.setName("jTextField2"); // NOI18N
-        jTextField2.setBounds(130, 40, 300, 22);
-        jLayeredPane2.add(jTextField2, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jLabel5.setFont(resourceMap.getFont("jLabel5.font")); // NOI18N
-        jLabel5.setText(resourceMap.getString("jLabel5.text")); // NOI18N
-        jLabel5.setName("jLabel5"); // NOI18N
-        jLabel5.setBounds(20, 100, 110, 20);
-        jLayeredPane2.add(jLabel5, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jButton2.setFont(resourceMap.getFont("jButton2.font")); // NOI18N
         jButton2.setText(resourceMap.getString("jButton2.text")); // NOI18N
@@ -185,16 +186,17 @@ public class AddFile extends javax.swing.JDialog {
                 jButton2ActionPerformed(evt);
             }
         });
-        jButton2.setBounds(100, 140, 140, 25);
+        jButton2.setBounds(100, 110, 140, 25);
         jLayeredPane2.add(jButton2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jLabel3.setFont(resourceMap.getFont("jLabel3.font")); // NOI18N
-        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
-        jLabel3.setName("jLabel3"); // NOI18N
-        jLabel3.setBounds(20, 40, 100, 20);
-        jLayeredPane2.add(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jComboBox1.setMaximumRowCount(13);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "App Icons", "App Launcher", "Applications", "Boot Logo", "Enyo Widgets", "Exhibition", "Just Type", "Keyboard", "Lock Screen", "Quick Launcher", "Status Bar", "System Menus", "Wallpapers" }));
+        jComboBox1.setSelectedIndex(2);
+        jComboBox1.setName("jComboBox1"); // NOI18N
+        jComboBox1.setBounds(130, 40, 180, 22);
+        jLayeredPane2.add(jComboBox1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jLayeredPane2.setBounds(10, 10, 450, 180);
+        jLayeredPane2.setBounds(10, 10, 450, 150);
         jLayeredPane1.add(jLayeredPane2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -205,7 +207,7 @@ public class AddFile extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -221,8 +223,7 @@ public class AddFile extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowClosed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if(jTextField1.getText().length()>0 && jTextField2.getText().length()>0) {
-            item.dest = formatDest(jTextField2.getText().trim());
+        if(jTextField1.getText().length()>0) {
             item.file = new File(jTextField1.getText());
             item.category = ((String) jComboBox1.getSelectedItem()).toLowerCase().replaceAll(" ", "_");
             version = ((String) jComboBox2.getSelectedItem()).replace("webOS ", "");
@@ -244,6 +245,14 @@ public class AddFile extends javax.swing.JDialog {
         }
         getContentPane().requestFocus();
     }//GEN-LAST:event_jTextField1MousePressed
+
+    private void jTextField2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField2MousePressed
+        // TODO add your handling code here:
+}//GEN-LAST:event_jTextField2MousePressed
+
+    private void jTextField2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField2MouseClicked
+        // TODO add your handling code here:
+}//GEN-LAST:event_jTextField2MouseClicked
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
@@ -253,10 +262,24 @@ public class AddFile extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JLayeredPane jLayeredPane2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
+
+    class FileChooseFilter extends javax.swing.filechooser.FileFilter {
+        private final String[] badFileExtensions = new String[] {".patch"};
+
+        public boolean accept(File f) {
+            for (String extension : badFileExtensions)
+                if (!f.getName().toLowerCase().endsWith(extension) || f.isDirectory())
+                    return true;
+            return false;
+        }
+
+        public String getDescription() {
+            return "Patch Files";
+        }
+    }
 }

@@ -2,30 +2,80 @@
 package ca.canucksoftware.themebuilder;
 
 import javax.swing.JFileChooser;
-import javax.swing.Icon;
-import java.awt.Component;
-import java.awt.Container;
-import javax.swing.UIManager;
-import javax.swing.JButton;
 import java.io.File;
+import java.util.List;
+import javax.swing.JOptionPane;
 
 public class AddIcon extends javax.swing.JDialog {
     public IconEntry item;
+    public String version;
     public File prevDir;
+    private boolean loaded;
+    private static final String[] appIDs = new String[] {
+        "com.palm.app.accounts",
+        "com.palm.app.backup",
+        "com.palm.app.bluetoothtab",
+        "com.palm.app.calendar",
+        "com.palm.app.camera",
+        "com.palm.app.contacts",
+        "com.palm.app.dateandtime",
+        "com.palm.app.deviceinfo",
+        "com.palm.app.devmodeswitcher",
+        "com.palm.app.email",
+        "com.palm.app.exhibitionpreferences",
+        "com.palm.app.firstuse",
+        "com.palm.app.help",
+        "com.palm.app.searchpreferences",
+        "com.palm.app.location",
+        "com.palm.app.notes",
+        "com.palm.app.messaging",
+        "com.palm.app.musicplayer",
+        "com.palm.app.phone",
+        "com.palm.app.photos",
+        "com.palm.app.printmanager",
+        "com.palm.app.languagepicker",
+        "com.palm.app.screenlock",
+        "com.palm.app.soundsandalerts",
+        "com.palm.app.swmanager",
+        "com.palm.app.updates",
+        "com.palm.app.tasks",
+        "com.palm.app.textassist",
+        "com.palm.app.videoplayer",
+        "com.palm.app.vpn",
+        "com.palm.sysapp.voicedial",
+        "com.palm.app.wifi",
+        "com.palm.app.youtube"
+    };
 
-    public AddIcon(java.awt.Frame parent, IconEntry curr) {
+    public AddIcon(java.awt.Frame parent, IconEntry curr, String currVersion, List<String> versions) {
         super(parent);
         initComponents();
+        loaded = false;
         if(curr!=null) {
-            item = new IconEntry();
-            item.image = curr.image;
-            item.appID = curr.appID;
+            setTitle("Edit Entry");
+            jButton2.setText("OK");
+            item = curr;
             jTextField1.setText(item.image.getPath());
-            jTextField2.setText(item.appID);
+            int index = indexOfAppID(item.appID);
+            if(index>-1) {
+                jComboBox1.setSelectedIndex(index);
+            } else {
+                int lastItem = jComboBox1.getItemCount()-1;
+                jComboBox1.removeItemAt(lastItem);
+                jComboBox1.addItem(item.appID);
+                jComboBox1.addItem("<Other...>");
+                jComboBox1.setSelectedIndex(lastItem);
+            }
         } else {
             item = new IconEntry();
         }
+        version = currVersion;
+        for(int i=0; i<versions.size(); i++) {
+            jComboBox2.addItem("webOS " + versions.get(i));
+        }
+        jComboBox2.setSelectedItem("webOS " + version);
         getContentPane().requestFocus();
+        loaded = true;
     }
 
     private File loadFileChooser() {
@@ -36,7 +86,6 @@ public class AddIcon extends javax.swing.JDialog {
         fc.setFileFilter(new PNGChooseFilter());
         fc.setMultiSelectionEnabled(false);
         fc.setDialogTitle("");
-        disableNewFolderButton(fc);
         if (fc.showDialog(null, "Select") == JFileChooser.APPROVE_OPTION) {
             prevDir = fc.getSelectedFile().getParentFile();
             return fc.getSelectedFile();
@@ -45,20 +94,15 @@ public class AddIcon extends javax.swing.JDialog {
         }
     }
 
-    private void disableNewFolderButton(Container c) {
-        int len = c.getComponentCount();
-        for(int i=0; i<len; i++) {
-            Component comp = c.getComponent(i);
-            if(comp instanceof JButton) {
-                JButton b = (JButton)comp;
-                Icon icon = b.getIcon();
-                if(icon != null && (icon == UIManager.getIcon("FileChooser.newFolderIcon")
-                        || icon == UIManager.getIcon("FileChooser.upFolderIcon")))
-                    b.setEnabled(false);
-            } else if (comp instanceof Container) {
-                disableNewFolderButton((Container)comp);
+    private int indexOfAppID(String id) {
+        int index = -1; //default is return first item's index;
+        for(int i=0; i<appIDs.length; i++) {
+            if(appIDs[i].equals(id)) {
+                index = i;
+                break;
             }
         }
+        return index;
     }
 
     public void closeAddContent() {
@@ -76,12 +120,14 @@ public class AddIcon extends javax.swing.JDialog {
 
         jLayeredPane1 = new javax.swing.JLayeredPane();
         jLayeredPane2 = new javax.swing.JLayeredPane();
-        jButton3 = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
         jButton2 = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jComboBox2 = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
+        jButton3 = new javax.swing.JButton();
+        jTextField1 = new javax.swing.JTextField();
+        jComboBox1 = new javax.swing.JComboBox();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(ca.canucksoftware.themebuilder.WebOSThemeBuilderApp.class).getContext().getResourceMap(AddIcon.class);
@@ -109,23 +155,6 @@ public class AddIcon extends javax.swing.JDialog {
         jLayeredPane2.setBorder(javax.swing.BorderFactory.createLineBorder(resourceMap.getColor("jLayeredPane2.border.lineColor"))); // NOI18N
         jLayeredPane2.setName("jLayeredPane2"); // NOI18N
 
-        jButton3.setFont(resourceMap.getFont("jButton3.font")); // NOI18N
-        jButton3.setText(resourceMap.getString("jButton3.text")); // NOI18N
-        jButton3.setName("jButton3"); // NOI18N
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
-            }
-        });
-        jButton3.setBounds(260, 80, 79, 25);
-        jLayeredPane2.add(jButton3, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-        jLabel3.setFont(resourceMap.getFont("jLabel3.font")); // NOI18N
-        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
-        jLabel3.setName("jLabel3"); // NOI18N
-        jLabel3.setBounds(20, 40, 110, 20);
-        jLayeredPane2.add(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
         jButton2.setFont(resourceMap.getFont("jButton2.font")); // NOI18N
         jButton2.setText(resourceMap.getString("jButton2.text")); // NOI18N
         jButton2.setName("jButton2"); // NOI18N
@@ -134,8 +163,35 @@ public class AddIcon extends javax.swing.JDialog {
                 jButton2ActionPerformed(evt);
             }
         });
-        jButton2.setBounds(100, 80, 140, 25);
+        jButton2.setBounds(100, 110, 140, 25);
         jLayeredPane2.add(jButton2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jLabel4.setFont(resourceMap.getFont("jLabel4.font")); // NOI18N
+        jLabel4.setText(resourceMap.getString("jLabel4.text")); // NOI18N
+        jLabel4.setName("jLabel4"); // NOI18N
+        jLabel4.setBounds(20, 70, 110, 20);
+        jLayeredPane2.add(jLabel4, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jComboBox2.setName("jComboBox2"); // NOI18N
+        jComboBox2.setBounds(130, 70, 180, 22);
+        jLayeredPane2.add(jComboBox2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jLabel2.setFont(resourceMap.getFont("jLabel2.font")); // NOI18N
+        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
+        jLabel2.setName("jLabel2"); // NOI18N
+        jLabel2.setBounds(20, 10, 100, 20);
+        jLayeredPane2.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        jButton3.setFont(resourceMap.getFont("jButton3.font")); // NOI18N
+        jButton3.setText(resourceMap.getString("jButton3.text")); // NOI18N
+        jButton3.setName("jButton3"); // NOI18N
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        jButton3.setBounds(260, 110, 79, 25);
+        jLayeredPane2.add(jButton3, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         jTextField1.setText(resourceMap.getString("jTextField1.text")); // NOI18N
         jTextField1.setFocusable(false);
@@ -151,18 +207,24 @@ public class AddIcon extends javax.swing.JDialog {
         jTextField1.setBounds(130, 10, 300, 22);
         jLayeredPane2.add(jTextField1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jLabel2.setFont(resourceMap.getFont("jLabel2.font")); // NOI18N
-        jLabel2.setText(resourceMap.getString("jLabel2.text")); // NOI18N
-        jLabel2.setName("jLabel2"); // NOI18N
-        jLabel2.setBounds(20, 10, 100, 20);
-        jLayeredPane2.add(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jComboBox1.setMaximumRowCount(15);
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Accounts", "Backup", "Bluetooth", "Calendar", "Camera", "Contacts", "Date & Time", "Device Info", "DevMode", "Email", "Exhibition Preferences", "Gesture Tutorial", "Help", "Just Type", "Location Services", "Memos", "Messaging", "Music", "Phone", "Photos", "Print Manager", "Regional Settings", "Screen & Lock", "Sounds & Ringtones", "Software Manager", "System Updates", "Tasks", "Text Assist", "Videos", "VPN", "Voice Dial", "Wi-Fi", "YouTube", "<Other...>" }));
+        jComboBox1.setName("jComboBox1"); // NOI18N
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
+        jComboBox1.setBounds(130, 40, 180, 22);
+        jLayeredPane2.add(jComboBox1, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jTextField2.setText(resourceMap.getString("jTextField2.text")); // NOI18N
-        jTextField2.setName("jTextField2"); // NOI18N
-        jTextField2.setBounds(130, 40, 300, 22);
-        jLayeredPane2.add(jTextField2, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLabel3.setFont(resourceMap.getFont("jLabel3.font")); // NOI18N
+        jLabel3.setText(resourceMap.getString("jLabel3.text")); // NOI18N
+        jLabel3.setName("jLabel3"); // NOI18N
+        jLabel3.setBounds(20, 40, 110, 20);
+        jLayeredPane2.add(jLabel3, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
-        jLayeredPane2.setBounds(10, 10, 450, 120);
+        jLayeredPane2.setBounds(10, 10, 450, 150);
         jLayeredPane1.add(jLayeredPane2, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -173,7 +235,7 @@ public class AddIcon extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLayeredPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 140, Short.MAX_VALUE)
+            .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -189,14 +251,20 @@ public class AddIcon extends javax.swing.JDialog {
     }//GEN-LAST:event_formWindowClosed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        item.appID = jTextField2.getText().trim();
-        if(item.appID.length()>1 && item.image!=null) {
+        if(jTextField1.getText().length()>0) {
+            int index = jComboBox1.getSelectedIndex();
+            if(index<appIDs.length) {
+                item.appID = appIDs[index];
+            } else {
+                item.appID = (String) jComboBox1.getSelectedItem();
+            }
+            item.image = new File(jTextField1.getText());
+            version = ((String) jComboBox2.getSelectedItem()).replace("webOS ", "");
             closeAddContent();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        item = null;
         closeAddContent();
     }//GEN-LAST:event_jButton3ActionPerformed
 
@@ -206,21 +274,38 @@ public class AddIcon extends javax.swing.JDialog {
     private void jTextField1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MousePressed
         File tmp = loadFileChooser();
         if(tmp!=null) {
-            item.image = tmp;
-            jTextField1.setText(item.image.getPath());
+            jTextField1.setText(tmp.getPath());
         }
         getContentPane().requestFocus();
     }//GEN-LAST:event_jTextField1MousePressed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        int lastItem = jComboBox1.getItemCount()-1;
+        if(loaded && jComboBox1.getSelectedIndex()==lastItem) {
+            String input = JOptionPane.showInputDialog("Enter the application's ID:");
+            jComboBox1.setSelectedIndex(0);
+            if(input != null) {
+                if(input.trim().length()>0) {
+                    jComboBox1.removeItemAt(lastItem);
+                    jComboBox1.addItem(input.trim());
+                    jComboBox1.addItem("<Other...>");
+                    jComboBox1.setSelectedIndex(lastItem);
+                }
+            }
+        }
+    }//GEN-LAST:event_jComboBox1ActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JLayeredPane jLayeredPane2;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 
     class PNGChooseFilter extends javax.swing.filechooser.FileFilter {
