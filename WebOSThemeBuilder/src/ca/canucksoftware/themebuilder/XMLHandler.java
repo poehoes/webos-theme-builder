@@ -32,6 +32,7 @@ public class XMLHandler {
             root = document.parse();
             fstream.close();
         } catch(Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "ERROR: Unable to read xml file.");
         }
     }
@@ -69,6 +70,7 @@ public class XMLHandler {
             out.flush();
             out.close();
         } catch(Exception e) {
+            e.printStackTrace();
             JOptionPane.showMessageDialog(null, "ERROR: Unable to write to xml file.");
         }
     }
