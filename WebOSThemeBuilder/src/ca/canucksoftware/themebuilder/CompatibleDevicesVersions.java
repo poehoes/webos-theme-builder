@@ -229,7 +229,7 @@ public class CompatibleDevicesVersions extends javax.swing.JDialog {
                     System.out.println("Adding " + curr);
                     if(curr.contains("->")) {
                         String ver = curr.substring(0, curr.indexOf(" "));
-                        String realVer = curr.substring(curr.lastIndexOf(" "));
+                        String realVer = curr.substring(curr.lastIndexOf(" ")+1);
                         theme.controller.addAlias(ver, realVer);
                     } else {
                         theme.controller.addVersion(curr);
