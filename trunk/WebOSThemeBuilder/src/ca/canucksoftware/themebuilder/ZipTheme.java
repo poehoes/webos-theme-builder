@@ -103,7 +103,7 @@ public class ZipTheme {
                     fileExt(firstTheme.wallpaper) + "</image>"));
         }
         for(int i=0; i<firstTheme.files.size(); i++) {
-            if(firstTheme.files.get(i).file.exists()) {
+            if(firstTheme.files.get(i).file!=null && firstTheme.files.get(i).file.exists()) {
                 TaggedElement file = (TaggedElement)Element.newElement("<file></file>");
                 content.add(file);
                 file.add((TaggedElement)Element.newElement("<filename>" + id + "/" + firstTheme.version + "/" +
@@ -113,7 +113,7 @@ public class ZipTheme {
             }
         }
         for(int i=0; i<firstTheme.patches.size(); i++) {
-            if(firstTheme.patches.get(i).file.exists()) {
+            if(firstTheme.patches.get(i).file!=null && firstTheme.patches.get(i).file.exists()) {
                 TaggedElement patch = (TaggedElement)Element.newElement("<patch></patch>");
                 content.add(patch);
                 patch.add((TaggedElement)Element.newElement("<diff>" + id + "/" + firstTheme.version + "/" +
@@ -124,7 +124,7 @@ public class ZipTheme {
             iconset = (TaggedElement)Element.newElement("<iconset></iconset>");
             content.add(iconset);
             for(int i=0; i<firstTheme.icons.size(); i++) {
-                if(firstTheme.icons.get(i).image.exists()) {
+                if(firstTheme.icons.get(i).image!=null && firstTheme.icons.get(i).image.exists()) {
                     TaggedElement icon = (TaggedElement)Element.newElement("<icon></icon>");
                     iconset.add(icon);
                     icon.add((TaggedElement)Element.newElement("<appid>" + firstTheme.icons.get(i).appID +
@@ -483,7 +483,9 @@ public class ZipTheme {
                 version = theme.getString("version");
                 creator = theme.getString("creator");
                 website = theme.getString("website");
-                donateURL = theme.getString("donations");
+                if(theme.has("donations")) {
+                    donateURL = theme.getString("donations");
+                }
                 description = theme.getString("description");
                 JSONArray jsonDevices = theme.getJSONArray("devices");
                 for(int i=0; i<jsonDevices.length(); i++) {
